@@ -5,11 +5,11 @@
 	calibration.h
 */
 
-void Calib_setup(int eepromAddress);
-void Calib_start(void);
-void Calib_newValue(int newValue);
-bool Calib_inProgress(void);
-int Calib_getValue(void);
-unsigned int Calib_toMilliVolts(unsigned int v);
+void Calibration_Setup(int eepromAddress);
+void Calibration_Start(void);
+void Calibration_NewValue(int newValue);
+bool Calibration_InProgress(void);
+int Calibration_GetValue(void);
+unsigned int Calibration_ToMilliVolts(unsigned int v);
 
 #endif

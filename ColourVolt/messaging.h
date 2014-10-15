@@ -5,10 +5,10 @@
 	messaging.h
 */
 
-void messagingBegin(int baud, int eepromAddress);
-void handleSerialComms(void);
-bool messageEquals(char const * str);
-void sendVoltage(unsigned int mv);
-void sendMessage(char const * message);
-void sendVoltageWithPrefix(char const * message, unsigned int mv);
+void Messaging_Begin(int baud, int eepromAddress);
+void Messaging_HandleSerialComms(void);
+bool Messaging_IsMessageEqualTo(char const * str);
+void Messaging_SendVoltage(unsigned int mv);
+void Messaging_SendMessage(char const * message);
+void Messaging_SendVoltageWithPrefix(char const * message, unsigned int mv);
 #endif

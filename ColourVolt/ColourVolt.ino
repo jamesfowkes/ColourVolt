@@ -70,10 +70,10 @@ void setup() {
 		// or writing EEPROM
 	}
 
-	messagingBegin(4800, DEVICE_ID_EEPROM_ADDRESS);
+	Messaging_Begin(4800, DEVICE_ID_EEPROM_ADDRESS);
 
 	// Give the calibration module its EEPROM address so it can read stored value
-	Calib_setup(CALIBRATION_EEPROM_ADDRESS);
+	Calibration_Setup(CALIBRATION_EEPROM_ADDRESS);
 
 	// Make sure threshold is properly set before the LEDs are updated
 	readRangeADCs();
@@ -112,21 +112,21 @@ void loop()
 		}
 	}
 	
-	handleSerialComms();
+	Messaging_HandleSerialComms();
 
 }
 
 void processNewReading(void)
 {
-	if ( Calib_inProgress() )
+	if ( Calibration_InProgress() )
 	{
 		// Update the calibration software - this has no effect unless calibration is running
 		setLEDs(LOW, LOW, LOW);
-		Calib_newValue(s_voltageReading); 
+		Calibration_NewValue(s_voltageReading); 
 		
-		if (!Calib_inProgress())
+		if (!Calibration_InProgress())
 		{
-			sendMessage("CAL. DONE");
+			Messaging_SendMessage("CAL. DONE");
 		}
 	}
 	else
@@ -187,31 +187,31 @@ void readRangeADCs(void)
 
 void handleRxMessage(char * message)
 {
-	if (messageEquals("V?"))
+	if (Messaging_IsMessageEqualTo("V?"))
 	{
 		sendReading(LIVE_VOLTS_READ);
 	}
-	else if (messageEquals("HT?"))
+	else if (Messaging_IsMessageEqualTo("HT?"))
 	{
 		sendReading(HIGH_TH_READ);
 	}
-	else if (messageEquals("LT?"))
+	else if (Messaging_IsMessageEqualTo("LT?"))
 	{
 		sendReading(LOW_TH_READ);
 	}
-	else if (messageEquals("SP?"))
+	else if (Messaging_IsMessageEqualTo("SP?"))
 	{
 		sendReading(SETPOINT_READ);
 	}
-	else if (messageEquals("RNG?"))
+	else if (Messaging_IsMessageEqualTo("RNG?"))
 	{
 		sendReading(RANGE_READ);
 	}
-	else if (messageEquals("CAL"))
+	else if (Messaging_IsMessageEqualTo("CAL"))
 	{
-		Calib_start();
+		Calibration_Start();
 	}
-	else if (messageEquals("SETUP"))
+	else if (Messaging_IsMessageEqualTo("SETUP"))
 	{
 		s_echoSetupInfo = !s_echoSetupInfo;
 	}
@@ -224,26 +224,26 @@ void sendReading(int reading_id)
 	switch (reading_id)
 	{
 	case LIVE_VOLTS_READ:
-		voltage = Calib_toMilliVolts(s_voltageReading);
-		sendVoltage(voltage);
+		voltage = Calibration_ToMilliVolts(s_voltageReading);
+		Messaging_SendVoltage(voltage);
 		break;
 	case SETPOINT_READ:
 		voltage = (s_highThreshold + s_lowThreshold) / 2;
-		voltage = Calib_toMilliVolts(voltage);
-		sendVoltageWithPrefix("SP", voltage);
+		voltage = Calibration_ToMilliVolts(voltage);
+		Messaging_SendVoltageWithPrefix("SP", voltage);
 		break;
 	case RANGE_READ:
 		voltage = (s_highThreshold - s_lowThreshold);
-		voltage = Calib_toMilliVolts(voltage);
-		sendVoltageWithPrefix("RNG", voltage);
+		voltage = Calibration_ToMilliVolts(voltage);
+		Messaging_SendVoltageWithPrefix("RNG", voltage);
 		break;
 	case HIGH_TH_READ:
-		voltage = Calib_toMilliVolts(s_highThreshold);
-		sendVoltageWithPrefix("HT", voltage);
+		voltage = Calibration_ToMilliVolts(s_highThreshold);
+		Messaging_SendVoltageWithPrefix("HT", voltage);
 		break;
 	case LOW_TH_READ:
-		voltage = Calib_toMilliVolts(s_lowThreshold);
-		sendVoltageWithPrefix("LT", voltage);
+		voltage = Calibration_ToMilliVolts(s_lowThreshold);
+		Messaging_SendVoltageWithPrefix("LT", voltage);
 		break;		
 	default:
 		break;

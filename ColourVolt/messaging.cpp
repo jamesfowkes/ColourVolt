@@ -193,7 +193,7 @@ static void voltageToTxMessage(unsigned int mv, uint8_t idx)
 
 /* Public Function Defintions */
 
-void messagingBegin(int baud, int eepromAddress)
+void Messaging_Begin(int baud, int eepromAddress)
 {  
 
 	s_softSerial.begin(baud);
@@ -212,10 +212,10 @@ void messagingBegin(int baud, int eepromAddress)
 	}
 
 	initTxMessage();
-	sendMessage("STARTED");
+	Messaging_SendMessage("STARTED");
 }
 
-void handleSerialComms(void)
+void Messaging_HandleSerialComms(void)
 {
 	if (s_softSerial.available())
 	{
@@ -233,7 +233,7 @@ void handleSerialComms(void)
 			if (isValidMessage() && deviceIDsMatch())
 			{
 				// Valid LLAP message, for this device
-				if (messageEquals("CHDEVID"))
+				if (Messaging_IsMessageEqualTo("CHDEVID"))
 				{
 					// Instruction to change device ID - handle locally
 					if (setDeviceID(s_rxMessage[10], s_rxMessage[11]))
@@ -242,7 +242,7 @@ void handleSerialComms(void)
 						char reply[] = "CHDEVID--";
 						reply[7] = s_deviceID[0];
 						reply[8] = s_deviceID[1];
-						sendMessage(reply);
+						Messaging_SendMessage(reply);
 					}
 				}
 				else
@@ -256,7 +256,7 @@ void handleSerialComms(void)
 	}   
 }
 
-bool messageEquals(char const * str)
+bool Messaging_IsMessageEqualTo(char const * str)
 {
 	int len = strlen(str);
 	int i;
@@ -274,7 +274,7 @@ bool messageEquals(char const * str)
 	return true;
 }
 
-void sendVoltage(unsigned int mv)
+void Messaging_SendVoltage(unsigned int mv)
 {
 	// Takes voltage in millivolts and sends to serial port (2 d.p.)
 	// e.g. 12345 mv gets sent as aXX12.34V where XX is the device ID
@@ -284,7 +284,7 @@ void sendVoltage(unsigned int mv)
 	s_softSerial.println(s_txMessage);
 }
 
-void sendVoltageWithPrefix(char const * message, unsigned int mv)
+void Messaging_SendVoltageWithPrefix(char const * message, unsigned int mv)
 {
 	uint8_t count = 0;
 
@@ -294,7 +294,7 @@ void sendVoltageWithPrefix(char const * message, unsigned int mv)
 	s_softSerial.println(s_txMessage);
 }
 
-void sendMessage(char const * message)
+void Messaging_SendMessage(char const * message)
 {
 	initTxMessage();
 	(void)copyToTxMessage(message, 0);

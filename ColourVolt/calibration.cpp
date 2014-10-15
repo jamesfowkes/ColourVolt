@@ -23,7 +23,7 @@ static int s_calibrationCount = 0;
 
 static bool s_calibrating = false;
 
-void Calib_setup(int eepromAddress)
+void Calibration_Setup(int eepromAddress)
 {
 	s_eepromAddress = eepromAddress;
 	
@@ -33,11 +33,11 @@ void Calib_setup(int eepromAddress)
 	s_calibrationValue += (int)EEPROM.read(eepromAddress + 1);
 }
 
-bool Calib_inProgress(void)
+bool Calibration_InProgress(void)
 {
    return s_calibrating; 
 }
-void Calib_start(void)
+void Calibration_Start(void)
 {
 	// Reset the calibration logging variables and set flag to start logging again
 	s_calibrating = true;
@@ -45,7 +45,7 @@ void Calib_start(void)
 	s_newValue = 0;
 }
 
-void Calib_newValue(int newValue)
+void Calibration_NewValue(int newValue)
 {
 	if (s_calibrating)
 	{
@@ -64,12 +64,12 @@ void Calib_newValue(int newValue)
 	}	
 }
 
-int Calib_getValue(void)
+int Calibration_GetValue(void)
 {
 	return s_calibrationValue;
 }
 
-unsigned int Calib_toMilliVolts(unsigned int v)
+unsigned int Calibration_ToMilliVolts(unsigned int v)
 {
 	unsigned long result = (VOLTAGE_AT_CALIBRATION_MV * (unsigned long)v) / (unsigned long)s_calibrationValue;
 	if (result > 65535) { result = 65535; }
