@@ -15,13 +15,13 @@
 #define VOLTAGE_AT_CALIBRATION_MV 10000
 
 /* Private Varibles */
-int s_calibrationValue = 0;
-int s_eepromAddress = 0;
+static int s_calibrationValue = 0;
+static int s_eepromAddress = 0;
 
-int s_newValue = 0;
-int s_calibrationCount = 0;
+static int s_newValue = 0;
+static int s_calibrationCount = 0;
 
-bool s_calibrating = false;
+static bool s_calibrating = false;
 
 void Calib_setup(int eepromAddress)
 {
@@ -73,3 +73,4 @@ unsigned int Calib_toMilliVolts(unsigned int v)
 {
 	return (VOLTAGE_AT_CALIBRATION_MV * v) / s_calibrationValue;
 }
+
