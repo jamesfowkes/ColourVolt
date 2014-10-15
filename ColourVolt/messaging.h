@@ -7,8 +7,8 @@
 
 void messagingBegin(int baud, int eepromAddress);
 void handleSerialComms(void);
-bool messageEquals(char * str);
+bool messageEquals(char const * str);
 void sendVoltage(unsigned int mv);
-void sendMessage(char * message);
-
+void sendMessage(char const * message);
+void sendVoltageWithPrefix(char const * message, unsigned int mv);
 #endif

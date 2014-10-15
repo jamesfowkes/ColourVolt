@@ -12,7 +12,7 @@
 
 /* Defines */
 #define NUMBER_OF_SAMPLES 100
-#define VOLTAGE_AT_CALIBRATION_MV 10000
+#define VOLTAGE_AT_CALIBRATION_MV 10000UL
 
 /* Private Varibles */
 static int s_calibrationValue = 0;
@@ -53,7 +53,7 @@ void Calib_newValue(int newValue)
 		s_newValue += newValue;
 		s_calibrationCount++;
 		
-		if(s_calibrationCount < NUMBER_OF_SAMPLES)
+		if(s_calibrationCount == NUMBER_OF_SAMPLES)
 		{
 			// Stop logging after NUMBER_OF_SAMPLES calibrations and store new value
 			s_calibrationValue = s_newValue / NUMBER_OF_SAMPLES;
@@ -71,6 +71,8 @@ int Calib_getValue(void)
 
 unsigned int Calib_toMilliVolts(unsigned int v)
 {
-	return (VOLTAGE_AT_CALIBRATION_MV * v) / s_calibrationValue;
+	unsigned long result = (VOLTAGE_AT_CALIBRATION_MV * (unsigned long)v) / (unsigned long)s_calibrationValue;
+	if (result > 65535) { result = 65535; }
+	return (unsigned int)result;
 }
 
