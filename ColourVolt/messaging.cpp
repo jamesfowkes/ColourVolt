@@ -233,7 +233,7 @@ void Messaging_HandleSerialComms(void)
 			if (isValidMessage() && deviceIDsMatch())
 			{
 				// Valid LLAP message, for this device
-				if (Messaging_IsMessageEqualTo("CHDEVID"))
+				if (Messaging_MessageIsEqualTo("CHDEVID"))
 				{
 					// Instruction to change device ID - handle locally
 					if (setDeviceID(s_rxMessage[10], s_rxMessage[11]))
@@ -256,7 +256,7 @@ void Messaging_HandleSerialComms(void)
 	}   
 }
 
-bool Messaging_IsMessageEqualTo(char const * str)
+bool Messaging_MessageIsEqualTo(char const * str)
 {
 	int len = strlen(str);
 	int i;
