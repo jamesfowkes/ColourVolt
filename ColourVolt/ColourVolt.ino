@@ -15,6 +15,7 @@ ColourVolt
 /* Application Includes */
 #include "calibration.h"
 #include "messaging.h"
+#include "averager.h"
 
 /* Defines */
 #define RED_PIN 6
@@ -32,11 +33,16 @@ ColourVolt
 #define MAIN_ADC 0
 #define RANGE_ADCS 1
 #define SETUP 2
+#define LED_UPDATE 3
 
 // How often to run each "task" in milliseconds
 #define MAIN_ADC_INTERVAL_MS 20
 #define RANGE_ADC_INTERVAL_MS 100
 #define SETUP_INTERVAL_MS 1500
+#define LED_UPDATE_INTERVAL_MS 250
+
+#define AVERAGER_TIME_MS 1000
+#define AVERAGER_N (AVERAGER_TIME_MS / MAIN_ADC_INTERVAL_MS)
 
 // IDs for which reading to send over serial
 #define LIVE_VOLTS_READ 0
@@ -52,11 +58,12 @@ static int s_highThreshold = 0;
 static int s_setpointReading = 0;
 static int s_rangeReading = 0;
 
-static bool s_newReadingReady = false;
-
 static bool s_echoSetupInfo = false;
 
-static unsigned long s_counters[3] = {0UL, 0UL, 0UL};
+static unsigned long s_counters[4] = {0UL, 0UL, 0UL, 0UL};
+
+static int s_averagerValues[AVERAGER_N];
+static Averager averager(AVERAGER_N, s_averagerValues);
 
 void setup() {
 
@@ -77,19 +84,22 @@ void setup() {
 
 	// Make sure threshold is properly set before the LEDs are updated
 	readRangeADCs();
-}
 
+	// Set starting average
+	s_voltageReading = analogRead(VOLTS_PIN);
+	averager.Reset( s_voltageReading );
+
+}
 void loop() 
 {
 	unsigned long newmillis=millis();
 
-	if( s_newReadingReady )
-	{ 
-		// There is a new ADC reading of the power input
-		processNewReading();
-		s_newReadingReady = false;
+	if ((newmillis - s_counters[LED_UPDATE]) > LED_UPDATE_INTERVAL_MS)
+	{
+		s_counters[LED_UPDATE] = newmillis;
+		updateLED();
 	}
-
+	
 	if ((newmillis - s_counters[MAIN_ADC]) > MAIN_ADC_INTERVAL_MS)
 	{
 		s_counters[MAIN_ADC] = newmillis;
@@ -116,8 +126,10 @@ void loop()
 
 }
 
-void processNewReading(void)
+void updateLED(void)
 {
+	s_voltageReading = averager.GetAverage();
+	
 	if ( Calibration_InProgress() )
 	{
 		// Update the calibration software - this has no effect unless calibration is running
@@ -164,8 +176,7 @@ void setLEDs(int r, int g, int b)
 void readMainADC(void)
 {
 	/* Reads the main ADC and flags that a new reading is ready */
-	s_voltageReading = analogRead(VOLTS_PIN);
-	s_newReadingReady = true;
+	averager.NewValue( analogRead(VOLTS_PIN) );
 }
 
 void readRangeADCs(void)
@@ -187,31 +198,31 @@ void readRangeADCs(void)
 
 void handleRxMessage(char * message)
 {
-	if (Messaging_IsMessageEqualTo("V?"))
+	if (Messaging_MessageIsEqualTo("V?"))
 	{
 		sendReading(LIVE_VOLTS_READ);
 	}
-	else if (Messaging_IsMessageEqualTo("HT?"))
+	else if (Messaging_MessageIsEqualTo("HT?"))
 	{
 		sendReading(HIGH_TH_READ);
 	}
-	else if (Messaging_IsMessageEqualTo("LT?"))
+	else if (Messaging_MessageIsEqualTo("LT?"))
 	{
 		sendReading(LOW_TH_READ);
 	}
-	else if (Messaging_IsMessageEqualTo("SP?"))
+	else if (Messaging_MessageIsEqualTo("SP?"))
 	{
 		sendReading(SETPOINT_READ);
 	}
-	else if (Messaging_IsMessageEqualTo("RNG?"))
+	else if (Messaging_MessageIsEqualTo("RNG?"))
 	{
 		sendReading(RANGE_READ);
 	}
-	else if (Messaging_IsMessageEqualTo("CAL"))
+	else if (Messaging_MessageIsEqualTo("CAL"))
 	{
 		Calibration_Start();
 	}
-	else if (Messaging_IsMessageEqualTo("SETUP"))
+	else if (Messaging_MessageIsEqualTo("SETUP"))
 	{
 		s_echoSetupInfo = !s_echoSetupInfo;
 	}
