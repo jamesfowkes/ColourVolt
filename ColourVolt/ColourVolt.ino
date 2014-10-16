@@ -245,7 +245,7 @@ void sendReading(int reading_id)
 		Messaging_SendVoltageWithPrefix("SP", voltage);
 		break;
 	case RANGE_READ:
-		voltage = (s_highThreshold - s_lowThreshold);
+		voltage = (s_highThreshold - s_lowThreshold) / 2;
 		voltage = Calibration_ToMilliVolts(voltage);
 		Messaging_SendVoltageWithPrefix("RNG", voltage);
 		break;
