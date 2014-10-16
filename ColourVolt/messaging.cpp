@@ -19,7 +19,7 @@
 #define TX_PIN 10
 
 /* Extern Function Prototypes */
-extern void handleRxMessage(char * message); // Application message handler
+extern void APP_HandleReceivedMsg(const char * message); // Application message handler
 
 /* Private Function Prototypes */
 static uint8_t getPlaceCount(unsigned int value, unsigned int place);
@@ -205,9 +205,6 @@ void Messaging_Begin(int baud, int eepromAddress)
 
 	if (!validIDChar(s_deviceID[0]) || !validIDChar(s_deviceID[1]))
 	{
-		s_softSerial.print("Invalid ID:");
-		s_softSerial.print(s_deviceID[0]);
-		s_softSerial.println(s_deviceID[1]);
 		(void)setDeviceID('-', '-'); // Default to '--' as ID if EEPROM not valid
 	}
 
@@ -248,7 +245,7 @@ void Messaging_HandleSerialComms(void)
 				else
 				{
 					// Pass message excluding 'aXX' to application
-					handleRxMessage(&s_rxMessage[3]);
+					APP_HandleReceivedMsg(&s_rxMessage[3]);
 				}
 			}
 			s_rx = 0;

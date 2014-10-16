@@ -1,10 +1,6 @@
 /*
-
-	averager.cpp
-	
-	- Simple averaging class
-	
-*/
+ * See averager.h for class documentation
+ */
 
 /* Arduino Library Includes */
 #include <Arduino.h>

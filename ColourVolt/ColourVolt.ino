@@ -196,8 +196,9 @@ void readRangeADCs(void)
 	}
 }
 
-void handleRxMessage(char * message)
+void APP_HandleReceivedMsg(const char * message)
 {
+    (void)message; // This application doesn't need to do anything with the message itself
 	if (Messaging_MessageIsEqualTo("V?"))
 	{
 		sendReading(LIVE_VOLTS_READ);

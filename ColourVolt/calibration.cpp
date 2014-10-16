@@ -37,6 +37,7 @@ bool Calibration_InProgress(void)
 {
    return s_calibrating; 
 }
+
 void Calibration_Start(void)
 {
 	// Reset the calibration logging variables and set flag to start logging again
